@@ -9,6 +9,8 @@
         <el-header>
           <CommonHeader />
         </el-header>
+        <!-- tag -->
+        <CommonTag />
         <el-main>
           <!-- 路由出口 -->
           <router-view></router-view>
@@ -21,9 +23,10 @@
 <script>
 import CommonAside from "../components/CommonAside";
 import CommonHeader from "../components/CommonHeader";
+import CommonTag from "../components/CommonTag";
 export default {
   name: "Main",
-  components: { CommonAside, CommonHeader },
+  components: { CommonAside, CommonHeader, CommonTag },
 };
 </script>
 
