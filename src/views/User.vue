@@ -5,7 +5,7 @@
       :visible.sync="dialogVisible"
       width="50%"
       :before-close="handleClose"
-      >>
+    >
       <!-- 用户表单信息 -->
       <el-form
         ref="form"
@@ -14,7 +14,6 @@
         :model="form"
         label-width="80px"
       >
-        >
         <el-form-item label="姓名" prop="name">
           <el-input placeholder="请输入姓名" v-model="form.name"></el-input>
         </el-form-item>
