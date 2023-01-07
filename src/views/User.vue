@@ -22,8 +22,8 @@
         </el-form-item>
         <el-form-item label="性别" prop="sex">
           <el-select v-model="form.sex" placeholder="请选择">
-            <el-option label="男" value="1"></el-option>
-            <el-option label="女" value="0"></el-option>
+            <el-option label="男" :value="1"></el-option>
+            <el-option label="女" :value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="出生日期" prop="birth">
@@ -32,6 +32,7 @@
               type="date"
               placeholder="选择日期"
               v-model="form.birth"
+              value-format="yyyy-MM-DD"
             ></el-date-picker>
           </el-col>
         </el-form-item>
@@ -45,14 +46,40 @@
       </span>
     </el-dialog>
     <div class="manage-header">
-      <el-button @click="dialogVisible = true" type="primary">
-        + 新增
-      </el-button>
+      <el-button @click="handleAdd" type="primary"> + 新增 </el-button>
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="name" label="姓名"> </el-table-column>
+        <el-table-column prop="sex" label="性别">
+          <template slot-scope="scope">
+            <span style="margin-left: 10px">
+              {{ scope.row.sex === 1 ? "男" : "女" }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="age" label="年龄"> </el-table-column>
+        <el-table-column prop="birth" label="出生日期"> </el-table-column>
+        <el-table-column prop="addr" label="地址"> </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">
+              编辑
+            </el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              @click="handleDelete(scope.$index, scope.row)"
+            >
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
 
 <script>
+import { getUser, addUser, editUser, delUser } from "../api";
 export default {
   name: "User",
   data() {
@@ -72,6 +99,8 @@ export default {
         birth: [{ required: true, message: "请选择出生日期" }],
         addr: [{ required: true, message: "请填写地址" }],
       },
+      tableData: [],
+      modelType: 0, // 0表示新增弹窗 1表示编辑
     };
   },
   // 提交用户表单
@@ -79,6 +108,13 @@ export default {
     submmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
+          if (this.modelType === 0) {
+            addUser(this.form).then(() => {
+              this.getList();
+            });
+          } else {
+            editUser(this.form);
+          }
           this.$refs.form.resetFields(); // 清空表单数据
           this.dialogVisible = false; // 关闭弹窗
         }
@@ -91,6 +127,52 @@ export default {
     cancle() {
       this.handleClose();
     },
+    // 新增方法
+    handleAdd() {
+      this.modelType = 0;
+      this.dialogVisible = true;
+    },
+    // 编辑方法
+    handleEdit($index, row) {
+      this.modelType = 1;
+      this.dialogVisible = true;
+      // 深拷贝  数据回显
+      this.form = JSON.parse(JSON.stringify(row));
+      // this.console.log($index);
+      // console.log(row);
+      // console.log(JSON.stringify(row));
+    },
+    handleDelete($index, row) {
+      this.$confirm("此操作将永久删除该用户, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          // 传递对象
+          delUser({ id: row.id }).then(() => {
+            this.$message({
+              type: "success",
+              message: "删除成功!",
+            });
+            this.getList();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    getList() {
+      getUser().then(({ data }) => {
+        this.tableData = data.list;
+      });
+    },
+  },
+  mounted() {
+    this.getList();
   },
 };
 </script>
