@@ -47,7 +47,19 @@
     </el-dialog>
     <div class="manage-header">
       <el-button @click="handleAdd" type="primary"> + 新增 </el-button>
-      <el-table :data="tableData" style="width: 100%">
+      <!-- form搜索区 -->
+      <el-form :inline="true" :model="userForm">
+        <el-form-item>
+          <el-input placeholder="请输入名称" v-model="userForm.name"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit">查询</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <!-- 内容区 -->
+    <div class="common-table">
+      <el-table stripe :data="tableData" style="width: 100%" height="90%">
         <el-table-column prop="name" label="姓名"> </el-table-column>
         <el-table-column prop="sex" label="性别">
           <template slot-scope="scope">
@@ -74,6 +86,15 @@
           </template>
         </el-table-column>
       </el-table>
+      <!-- 分页栏 -->
+      <div class="pager">
+        <el-pagination
+          layout="prev, pager, next"
+          :total="total"
+          @current-change="handlePage"
+        >
+        </el-pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -101,6 +122,15 @@ export default {
       },
       tableData: [],
       modelType: 0, // 0表示新增弹窗 1表示编辑
+      total: 0, // 分页页数
+      pageData: {
+        // 分页参数
+        page: 1,
+        limit: 10,
+      },
+      userForm: {
+        name: "",
+      },
     };
   },
   // 提交用户表单
@@ -142,6 +172,7 @@ export default {
       // console.log(row);
       // console.log(JSON.stringify(row));
     },
+    // 删除方法
     handleDelete($index, row) {
       this.$confirm("此操作将永久删除该用户, 是否继续?", "提示", {
         confirmButtonText: "确定",
@@ -166,9 +197,25 @@ export default {
         });
     },
     getList() {
-      getUser().then(({ data }) => {
-        this.tableData = data.list;
-      });
+      // axios传url参数定义为对象
+      getUser({ params: { ...this.userForm, ...this.pageData } }).then(
+        ({ data }) => {
+          // console.log(data);
+          this.tableData = data.list;
+          this.total = data.count || 0;
+        }
+      );
+    },
+    // 页面分页
+    handlePage(val) {
+      // console.log(val);  页码
+      this.pageData.page = val;
+      console.log(this.pageData);
+      this.getList();
+    },
+    // 列表查询
+    onSubmit() {
+      this.getList();
     },
   },
   mounted() {
@@ -177,5 +224,22 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less" scoped>
+.manage {
+  height: 90%;
+  .manage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .common-table {
+    position: relative;
+    height: calc(100% - 62px);
+    .pager {
+      position: absolute;
+      bottom: 0;
+      right: 20px;
+    }
+  }
+}
 </style>

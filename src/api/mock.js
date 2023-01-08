@@ -11,4 +11,4 @@ Mock.mock('/api/home/getData', 'get', homeApi.getStatisticalData)
 Mock.mock('/api/user/add', 'post', user.createUser)
 Mock.mock('/api/user/edit', 'post', user.updateUser)
 Mock.mock('/api/user/del', 'post', user.deleteUser)
-Mock.mock('/api/user/getUser', 'get', user.getUserList)
+Mock.mock(/api\/user\/getUser/, user.getUserList)  // 正则匹配
