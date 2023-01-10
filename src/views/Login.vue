@@ -7,7 +7,7 @@
     :rules="rules"
     ref="form"
   >
-    <h3 class="login_title">系统登录</h3>
+    <h3 class="login_title">😋🤨系统登录</h3>
     <el-form-item label="用户名" prop="username">
       <el-input v-model="form.username" placeholder="请输入账号"></el-input>
     </el-form-item>
@@ -28,7 +28,7 @@
 
 <script>
 import startSakura from "../util/sakura.js";
-// import cursor from "../util/cursor.js";
+import cursor from "../util/cursor.js";
 import Mock from "mockjs";
 import Cookie from "js-cookie";
 import { geMenu, getMenu } from "../api";
@@ -62,6 +62,10 @@ export default {
             if (data.code === 20000) {
               // 存入token
               Cookie.set("token", data.data.token);
+              // 获取菜单数据  存入store中
+              this.$store.commit("setMenu", data.data.menu);
+              this.$store.commit("addMenu", this.$router);
+
               this.$message.success(`欢迎${this.form.username}`);
               // 跳转
               this.$router.push("/home");
@@ -73,15 +77,7 @@ export default {
       });
     },
   },
-  mounted() {
-    // fairyDustCursor();
-  },
-  //   mounted() {
-  //     let script = document.createElement("script");
-  //     script.type = "text/javascript";
-  //     script.src = "../util/sakura.js";
-  //     document.body.appendChild(script);
-  //   },
+  mounted() {},
 };
 </script>
 

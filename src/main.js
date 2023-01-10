@@ -18,5 +18,8 @@ Vue.use(ElementUI)
 new Vue({
   router,
   store,
+  created() {
+    store.commit("addMenu", router)  // 解决刷新白屏问题
+  },
   render: h => h(App),
 }).$mount('#app')

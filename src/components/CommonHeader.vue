@@ -48,6 +48,8 @@ export default {
     handleClick(command) {
       if (command === "cancel") {
         Cookie.remove("token");
+        Cookie.remove("menu");
+
         // 跳转
         this.$router.push("/login");
       }
